@@ -8,3 +8,5 @@
 ```ps1
 > .\Generate-FolderTreemapHTML.ps1 -Path "c:\users\haru"
 ```
+
+![animation](./animation.gif "animation")
