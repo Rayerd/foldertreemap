@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$Path = ".",
     [string]$OutputHtml = "nested_treemap.html"
 )
