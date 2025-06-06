@@ -43,6 +43,7 @@ function Get-FolderSizeJson {
                     name = $file.Name
                     size = $file.Length
                     type = "file"
+					fullPath = $file.FullName
                 }
                 $totalSize += $file.Length
             } else {
@@ -212,6 +213,28 @@ $html = @"
         z-index: 10000;
         user-select: none;
     }
+	.link-icon {
+	    position: absolute;
+	    top: 2px;
+	    right: 2px;
+	    width: 16px;
+	    height: 16px;
+	    background: rgba(255, 255, 255, 0.8);
+	    border-radius: 3px;
+	    text-align: center;
+	    font-size: 12px;
+	    color: #333;
+	    text-decoration: none;
+	    z-index: 2000;
+	    opacity: 0;
+	    pointer-events: none;
+	    transition: opacity 0.2s ease;
+	}
+	/* ノードにホバーしたときだけチェーンマークを表示 */
+	.node:hover .link-icon {
+	    opacity: 1;
+	    pointer-events: auto;
+	}
 </style>
 </head>
 <body>
@@ -325,6 +348,19 @@ function createTreemap(container, node, totalSize, scale = 1, level = 0) {
         label.textContent = child.name + ' (' + (child.size / 1024 / 1024).toFixed(1) + ' MB)';
         div.appendChild(label);
         container.appendChild(div);
+
+		// file:/// リンクを右上に追加（↗マーク）
+		if (child.type === 'folder' || child.type === 'file') {
+		    const fileUrl = 'file:///' + encodeURIComponent((child.fullPath || '').replace(/\\/g, '/')).replace(/%2F/g, '/');
+		    const link = document.createElement('a');
+		    link.href = fileUrl;
+		    link.target = '_blank';
+		    link.className = 'link-icon';
+		    link.title = 'このフォルダ/ファイルを開く';
+		    link.textContent = '↗';
+		    link.addEventListener('click', e => e.stopPropagation()); // 親のクリックイベントを無効化
+		    div.appendChild(link);
+		}
 
         // 2階層下までのサブツリーマップをネスト表示
         if (child.type === 'folder' && child.children?.length && level < 2) {
